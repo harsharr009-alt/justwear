@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JustWear - 24Hr Clothing Delivery</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>JustWear</h1>
+    <p>Delivering Clothes in 24 Hours 👕</p>
+    <nav>
+      <a href="#">Home</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+      <button id="cartBtn">🛒 Cart (<span id="cartCount">0</span>)</button>
+<button id="loginBtn">🔑 Login</button>
+<button id="logoutBtn" style="display:none;">🚪 Logout</button>
+<span id="userName" style="margin-left:10px; font-weight:bold;"></span>
+
+
+    </nav>
+    <button id="themeToggle" class="theme-btn">🌙</button>
+  </header>
+
+  <!-- Search bar -->
+  <div class="search-container">
+    <input type="text" id="searchBar" placeholder="Search for clothes, brands, or styles..." />
+    <button id="clearSearch">✖</button>
+  </div>
+
+  <!-- Product Section -->
+  <section class="shop">
+    <h2>Branded Clothes</h2>
+    <div class="product-grid">
+      <div class="card" data-brand="Nike">
+        <img src="images/nike1.jpg" alt="Nike T-Shirt">
+        <h3>Nike Sports Tee</h3>
+        <p>₹1499</p>
+        <button onclick="addToCart('Nike Sports Tee', 1499)">Add to Cart</button>
+      </div>
+      <div class="card" data-brand="Puma">
+        <img src="images/puma1.jpg" alt="Puma Hoodie">
+        <h3>Puma Hoodie</h3>
+        <p>₹1999</p>
+        <button onclick="addToCart('Puma Hoodie', 1999)">Add to Cart</button>
+      </div>
+      <div class="card" data-brand="Westside">
+        <img src="images/westside1.jpg" alt="Westside Shirt">
+        <h3>Westside Formal Shirt</h3>
+        <p>₹1299</p>
+        <button onclick="addToCart('Westside Formal Shirt', 1299)">Add to Cart</button>
+      </div>
+    </div>
+
+    <h2>Normal Stylish Clothes</h2>
+    <div class="product-grid">
+      <div class="card" data-brand="Local">
+        <img src="images/normal1.jpg" alt="Casual T-Shirt">
+        <h3>Casual T-Shirt</h3>
+        <p>₹599</p>
+        <button onclick="addToCart('Casual T-Shirt', 599)">Add to Cart</button>
+      </div>
+      <div class="card" data-brand="Local">
+        <img src="images/normal2.jpg" alt="Denim Jacket">
+        <h3>Denim Jacket</h3>
+        <p>₹999</p>
+        <button onclick="addToCart('Denim Jacket', 999)">Add to Cart</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cart Popup -->
+  <div class="cart-popup" id="cartPopup">
+    <div class="cart-content">
+      <h2>Your Cart</h2>
+      <ul id="cartItems"></ul>
+      <h3>Total: ₹<span id="cartTotal">0</span></h3>
+      <button id="checkoutBtn">Proceed to Pay</button>
+      <button id="closeCart">Close</button>
+    </div>
+  </div>
+
+  <!-- Payment Popup -->
+<div class="popup" id="paymentPopup">
+  <div class="popup-content">
+    <h2>Payment Details</h2>
+
+    <form id="paymentForm">
+      <label>Full Name</label>
+      <input type="text" id="name" placeholder="Enter full name" required><br>
+
+      <label>Address</label>
+      <input type="text" id="address" placeholder="Delivery address" required><br>
+
+      <label>Payment Method</label><br>
+      <div class="payment-methods">
+        <label>
+          <input type="radio" name="payment" value="UPI" required>
+          🪙 UPI Payment
+        </label>
+        <label>
+          <input type="radio" name="payment" value="COD">
+          💵 Cash on Delivery
+        </label>
+      </div>
+
+      <div id="upiSection" style="display:none;">
+        <label>UPI ID</label>
+        <input type="text" id="upiId" placeholder="example@upi"><br>
+      </div>
+
+      <button id="payBtn">Confirm Payment</button>
+    </form>
+  </div>
+</div>
+  <!-- Order Confirmation -->
+  <div class="popup" id="confirmPopup">
+    <div class="popup-content">
+      <h2>🎉 Order Placed!</h2>
+      <p>Your clothes will be delivered within 24 hours.</p>
+      <button id="closeConfirm">Close</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 JustWear. All Rights Reserved.</p>
+  </footer>
+
+  <script>
+// ---------- PAYMENT LOGIC ----------
+const paymentPopup = document.getElementById("paymentPopup");
+const paymentForm = document.getElementById("paymentForm");
+const confirmPopup = document.getElementById("confirmPopup");
+const confirmMessage = document.getElementById("confirmMessage");
+const upiSection = document.getElementById("upiSection");
+
+// Show UPI input if UPI selected
+paymentForm.addEventListener("change", (e) => {
+  const selected = document.querySelector('input[name="payment"]:checked')?.value;
+  upiSection.style.display = selected === "UPI" ? "block" : "none";
+});
+
+paymentForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById("name").value.trim();
+  const address = document.getElementById("address").value.trim();
+  const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value;
+  const upiId = document.getElementById("upiId").value.trim();
+
+  if (!name || !address || !paymentMethod) {
+    alert("Please fill all required fields!");
+    return;
+  }
+
+  if (paymentMethod === "UPI" && !upiId) {
+    alert("Please enter your UPI ID!");
+    return;
+  }
+
+  paymentPopup.style.display = "none";
+  confirmPopup.style.display = "flex";
+
+  if (paymentMethod === "UPI") {
+    confirmMessage.innerHTML = `✅ Payment received via <b>UPI (${upiId})</b>.<br>Your clothes will be delivered in 24 hours.`;
+  } else {
+    confirmMessage.innerHTML = `💵 Order placed with <b>Cash on Delivery</b>.<br>Pay when your clothes arrive within 24 hours.`;
+  }
+
+  cart = [];
+  updateCart();
+});
+
+document.getElementById("closeConfirm").addEventListener("click", () => {
+  confirmPopup.style.display = "none";
+});
+
+    // ---------- CART FUNCTIONALITY ----------
+    let cart = [];
+
+    function addToCart(name, price) {
+      const existing = cart.find(i => i.name === name);
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push({ name, price, qty: 1 });
+      }
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartItems = document.getElementById("cartItems");
+      const cartCount = document.getElementById("cartCount");
+      const cartTotal = document.getElementById("cartTotal");
+      cartItems.innerHTML = "";
+      let total = 0;
+
+      cart.forEach((item, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          ${item.name} - ₹${item.price} × ${item.qty}
+          <button onclick="removeItem(${index})">❌</button>
+        `;
+        cartItems.appendChild(li);
+        total += item.price * item.qty;
+      });
+
+      cartCount.textContent = cart.length;
+      cartTotal.textContent = total;
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      updateCart();
+    }
+
+    document.getElementById("cartBtn").addEventListener("click", () => {
+      document.getElementById("cartPopup").style.display = "flex";
+    });
+
+    document.getElementById("closeCart").addEventListener("click", () => {
+      document.getElementById("cartPopup").style.display = "none";
+    });
+
+    document.getElementById("checkoutBtn").addEventListener("click", () => {
+      if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+      document.getElementById("cartPopup").style.display = "none";
+      document.getElementById("paymentPopup").style.display = "flex";
+    });
+
+    document.getElementById("paymentForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      document.getElementById("paymentPopup").style.display = "none";
+      document.getElementById("confirmPopup").style.display = "flex";
+      cart = [];
+      updateCart();
+    });
+
+    document.getElementById("closeConfirm").addEventListener("click", () => {
+      document.getElementById("confirmPopup").style.display = "none";
+    });
+
+    // ---------- SEARCH ----------
+    const searchBar = document.getElementById("searchBar");
+    const clearSearch = document.getElementById("clearSearch");
+
+    searchBar.addEventListener("input", () => {
+      const term = searchBar.value.toLowerCase();
+      document.querySelectorAll(".card").forEach(card => {
+        const name = card.querySelector("h3").textContent.toLowerCase();
+        const brand = card.dataset.brand.toLowerCase();
+        card.style.display = name.includes(term) || brand.includes(term) ? "block" : "none";
+      });
+    });
+
+    clearSearch.addEventListener("click", () => {
+      searchBar.value = "";
+      document.querySelectorAll(".card").forEach(card => card.style.display = "block");
+    });
+
+    // ---------- DARK MODE ----------
+    const themeToggle = document.getElementById("themeToggle");
+    const currentTheme = localStorage.getItem("theme") || "light";
+    document.body.classList.toggle("dark-mode", currentTheme === "dark");
+    themeToggle.textContent = currentTheme === "dark" ? "☀️" : "🌙";
+
+    themeToggle.addEventListener("click", () => {
+      const isDark = document.body.classList.toggle("dark-mode");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+      themeToggle.textContent = isDark ? "☀️" : "🌙";
+    });
+  </script>
+<footer>
+  <p>&copy; 2025 JustWear — Fast 24hr Clothing Delivery</p>
+  <p class="admin-access">
+    <a href="admin-login.html" id="adminLink">Admin Access</a>
+  </p>
+</footer>
+<script>
+  document.getElementById("adminLink").addEventListener("click", (e) => {
+    const confirmAccess = confirm("Admin area — continue?");
+    if (!confirmAccess) e.preventDefault();
+  });
+</script>
+
+</body>
+</html>

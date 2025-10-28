@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JustWear - My Orders</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <script>
+    const user = localStorage.getItem("loggedInUser");
+    if (!user) {
+      alert("Please login to view your orders!");
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <header>
+    <h1>JustWear</h1>
+    <p>Delivering Style in 24 Hours</p>
+    <nav>
+      <a href="index.html">🏠 Home</a>
+      <a href="orders.html" class="active">📦 My Orders</a>
+      <button id="logoutBtn" class="logout-btn">Logout</button>
+    </nav><button id="themeToggle" class="theme-btn">🌙</button>
+
+  </header>
+
+  <section class="orders-page">
+    <h2>Your Orders</h2>
+    <div id="ordersContainer"></div>
+  </section>
+
+  <footer>
+    <h3>Contact Us</h3>
+    <p>Email: support@justwear.com | Phone: +91 98765 43210</p>
+    <p>© 2025 JustWear. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const ordersContainer = document.getElementById("ordersContainer");
+    const allOrders = JSON.parse(localStorage.getItem("justwearOrders")) || [];
+    const currentUser = localStorage.getItem("loggedInUser");
+
+    const userOrders = allOrders.filter(o => o.user === currentUser);
+
+    if (userOrders.length === 0) {
+      ordersContainer.innerHTML = "<p>You have no previous orders.</p>";
+    } else {
+      userOrders.forEach(order => {
+        const div = document.createElement("div");
+        div.classList.add("order-card");
+        div.innerHTML = `
+          <h3>Order #${order.id}</h3>
+          <p><strong>Date:</strong> ${order.date}</p>
+          <p><strong>Total:</strong> ₹${order.total}</p>
+          <ul>
+            ${order.items.map(i => `<li>${i.name} × ${i.qty}</li>`).join('')}
+          </ul>
+          <p class="status">Status: <span>Delivered within 24hrs 🚚</span></p>
+        `;
+        ordersContainer.appendChild(div);
+      });
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "login.html";
+    });
+  </script>
+<script>
+  const themeToggle = document.getElementById("themeToggle");
+  const currentTheme = localStorage.getItem("theme") || "light";
+
+  document.body.classList.toggle("dark-mode", currentTheme === "dark");
+  themeToggle.textContent = currentTheme === "dark" ? "☀️" : "🌙";
+
+  themeToggle.addEventListener("click", () => {
+    const isDark = document.body.classList.toggle("dark-mode");
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    themeToggle.textContent = isDark ? "☀️" : "🌙";
+  });
+</script>
+
+</body>
+</html>

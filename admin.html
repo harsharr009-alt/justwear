@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JustWear Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>👑 JustWear Admin Panel</h1>
+    <button id="logoutAdmin">Logout</button>
+  </header>
+
+  <section class="admin-section">
+<!-- ---------- VIEW ORDERS MODAL ---------- -->
+<div id="orderModal" class="modal">
+  <div class="modal-content">
+    <span class="closeModal">&times;</span>
+    <h2>🧾 All Orders Summary</h2>
+    <div id="orderSummary"></div>
+  </div>
+</div>
+
+    <h2>🧑‍🤝‍🧑 Registered Users</h2>
+    <table id="userTable">
+      <thead>
+        <tr><th>Username</th><th>Action</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h2>📦 Orders</h2>
+<button id="viewOrdersBtn">👁️ View All Orders</button>
+    <table id="orderTable">
+      <thead>
+        <tr><th>User</th><th>Items</th><th>Payment</th><th>Address</th><th>Date</th><th>Action</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <script>
+    // --- Access Control ---
+    if (localStorage.getItem("adminLoggedIn") !== "true") {
+      alert("Access denied! Please log in as admin.");
+      window.location.href = "admin-login.html";
+    }
+
+    document.getElementById("logoutAdmin").addEventListener("click", () => {
+      localStorage.removeItem("adminLoggedIn");
+      window.location.href = "admin-login.html";
+    });
+
+    const userTableBody = document.querySelector("#userTable tbody");
+    const orderTableBody = document.querySelector("#orderTable tbody");
+
+    function loadUsers() {
+      const users = JSON.parse(localStorage.getItem("justwearUsers")) || [];
+      userTableBody.innerHTML = "";
+      users.forEach((u, i) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${u.username}</td>
+          <td><button onclick="deleteUser(${i})">🗑️ Delete</button></td>
+        `;
+        userTableBody.appendChild(row);
+      });
+    }
+
+    function loadOrders() {
+      const orders = JSON.parse(localStorage.getItem("justwearOrders")) || [];
+      orderTableBody.innerHTML = "";
+      orders.forEach((o, i) => {
+        const items = o.items.map(it => `${it.name} (x${it.qty})`).join("<br>");
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${o.user}</td>
+          <td>${items}</td>
+          <td>${o.payment}</td>
+          <td>${o.address}</td>
+          <td>${o.date}</td>
+          <td><button onclick="deleteOrder(${i})">🗑️ Delete</button></td>
+        `;
+        orderTableBody.appendChild(row);
+      });
+    }
+
+    function deleteUser(i) {
+      const users = JSON.parse(localStorage.getItem("justwearUsers")) || [];
+      if (confirm("Delete user " + users[i].username + "?")) {
+        users.splice(i, 1);
+        localStorage.setItem("justwearUsers", JSON.stringify(users));
+        loadUsers();
+      }
+    }
+
+    function deleteOrder(i) {
+      const orders = JSON.parse(localStorage.getItem("justwearOrders")) || [];
+      if (confirm("Delete this order?")) {
+        orders.splice(i, 1);
+        localStorage.setItem("justwearOrders", JSON.stringify(orders));
+        loadOrders();
+      }
+    }
+
+    loadUsers();
+    loadOrders();
+  </script>
+</body>
+</html>

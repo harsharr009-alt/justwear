@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JustWear - Sign Up</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="auth-container">
+    <h2>Create a JustWear Account</h2>
+    <form id="signupForm">
+      <input type="text" id="newUsername" placeholder="Choose Username" required><br>
+      <input type="password" id="newPassword" placeholder="Choose Password" required><br>
+      <button type="submit">Sign Up</button>
+    </form>
+    <p>Already have an account? <a href="login.html">Login here</a></p>
+  </div>
+
+  <script>
+    document.getElementById("signupForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const username = document.getElementById("newUsername").value.trim();
+      const password = document.getElementById("newPassword").value.trim();
+
+      if (!username || !password) {
+        alert("Please fill all fields!");
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem("justwearUsers")) || [];
+      const exists = users.find(u => u.username === username);
+
+      if (exists) {
+        alert("Username already exists!");
+        return;
+      }
+
+      users.push({ username, password });
+      localStorage.setItem("justwearUsers", JSON.stringify(users));
+
+      alert("Account created successfully!");
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>

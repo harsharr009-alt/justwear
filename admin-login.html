@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JustWear Admin Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="auth-container">
+    <h2>👑 JustWear Admin Login</h2>
+    <form id="adminLoginForm">
+      <input type="text" id="adminUsername" placeholder="Admin Username" required><br>
+      <input type="password" id="adminPassword" placeholder="Password" required><br>
+      <button type="submit">Login</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("adminLoginForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const username = document.getElementById("adminUsername").value.trim();
+      const password = document.getElementById("adminPassword").value.trim();
+
+      // Default admin credentials
+      if (username === "admin" && password === "admin123") {
+        localStorage.setItem("adminLoggedIn", "true");
+        alert("Welcome, Admin!");
+        window.location.href = "admin.html";
+      } else {
+        alert("Invalid admin credentials!");
+      }
+    });
+  </script>
+</body>
+</html>
